@@ -1,0 +1,23 @@
+[out:json][timeout:120];
+
+// Définir la zone de recherche (Occitanie)
+{{geocodeArea:Occitanie}}->.searchArea;
+
+// Recherche de tous les centres sportifs (gymnases)
+nwr[leisure="sports_hall"](area.searchArea)->.sportcentre;
+
+// Recherche des terrains de tennis proches d'un gymnase
+nwr(around.sportcentre:50)["sport"="tennis"]->.tennis_near_sportcentre;
+
+// Recherche des pistes d'athlétisme proches d'un terrain de tennis
+nwr(around.tennis_near_sportcentre:50)["sport"="athletics"]->.athletic_near_tennis;
+
+// Recherche des terrains de football proches d'une piste d'athlétisme
+nwr(around.athletic_near_tennis:50)["sport"="soccer"]->.soccer_near_athletic;
+
+// Recherche des city-stades (terrains multisports) proches d'un terrain de football
+nwr(around.soccer_near_athletic:500)[leisure="pitch"][sport="multi"]->.city_near_soccer;
+
+// Affichage du résultat final
+(.city_near_soccer;);
+out center;

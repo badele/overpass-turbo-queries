@@ -1,0 +1,40 @@
+[out:json][timeout:120];
+
+// Sélectionner toutes les forêts dans la zone
+(
+  way["landuse"="forest"]({{bbox}});
+  relation["landuse"="forest"]({{bbox}});
+)->.all_forest;
+
+// Filtrer les picnic proches des forêts
+nwr(around.all_forest:300)["tourism"="picnic_site"]->.picnic_near_forest;
+
+// Filtrer les forêts proches des picnic filtrés
+(
+  way(around.picnic_near_forest:300)["landuse"="forest"];
+  relation(around.picnic_near_forest:300)["landuse"="forest"];
+)->.forest_near_picnic;
+
+// Récupérer les noeuds pour dessiner les contours
+.forest_near_picnic >->.forest_nodes;
+
+// Affichage final
+(.forest_near_picnic; .forest_nodes; .picnic_near_forest;);
+
+out body;
+
+{{style:
+way[landuse=forest],
+relation[landuse=forest] {
+  color:green;
+  fill-color:#88cc88;
+  fill-opacity:0.4;
+}
+
+node[tourism=picnic_site],
+way[tourism=picnic_site],
+relation[tourism=picnic_site] {
+  color:black;
+  width:3;
+}
+}}
